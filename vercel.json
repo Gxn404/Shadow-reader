@@ -3,7 +3,13 @@
   "builds": [
     {
       "src": "api/**/*.js",
-      "use": "@vercel/node"
+      "use": "@vercel/node",
+      "config": {
+        "externalCache": true,
+        "functions": {
+          "esm": true
+        }
+      }
     }
   ],
   "routes": [
