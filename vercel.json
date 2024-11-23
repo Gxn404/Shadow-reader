@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "api/**/*.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": {
+    "/api/manga/fetchId": "/api/manga/fetchId.js",
+    "/api/manga/search": "/api/manga/search.js",
+    "/api/manga/:id": "/api/manga/[id].js"
+  }
+}
