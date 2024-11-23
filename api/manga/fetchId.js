@@ -1,12 +1,11 @@
-
-import axios from "axios";
-import NodeCache from "node-cache";
-import cors from "cors";
+const axios = require("axios");
+const NodeCache = require("node-cache");
+const cors = require("cors");
 
 const cache = new NodeCache({ stdTTL: process.env.CACHE_TTL || 600, checkperiod: 300 });
 const MANGADX_API_URL = process.env.MANGADX_API_URL || "https://api.mangadex.org";
 
-const handler = async (req, res) => {
+module.exports = async (req, res) => {
   cors()(req, res, async () => {
     const query = req.query.query || "";
 
@@ -37,7 +36,7 @@ const handler = async (req, res) => {
           const relationships = mangaDetailsResponse.data.data.relationships || [];
 
           const coverArtRelationship = relationships.find((rel) => rel.type === "cover_art");
-          let coverUrl = "default-cover.jpg"; 
+          let coverUrl = "default-cover.jpg"; // Default cover
 
           if (coverArtRelationship) {
             const coverResponse = await axios.get(`${MANGADX_API_URL}/cover/${coverArtRelationship.id}`);
@@ -59,7 +58,7 @@ const handler = async (req, res) => {
         }
       });
 
-      const mangaDetails = (await Promise.all(mangaDetailsPromises)).filter((details) => details);
+      const mangaDetails = (await Promise.all(mangaDetailsPromises)).filter(Boolean);
 
       cache.set(cacheKey, mangaDetails);
 
@@ -69,6 +68,3 @@ const handler = async (req, res) => {
     }
   });
 };
-
-export default handler;
-
