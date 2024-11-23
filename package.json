@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 
 {
   "name": "manga-api",
@@ -17,4 +17,3 @@
     "start": "vercel dev"
   }
 }
->>>>>>> 1f0d6e76c56170febf855ad016dcaeb4bea37b11
