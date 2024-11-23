@@ -1,42 +1,44 @@
-const axios = require("axios");
-const NodeCache = require("node-cache");
-const cors = require("cors");
+import axios from "axios";
+import NodeCache from "node-cache";
+import dotenv from "dotenv";
 
-const cache = new NodeCache({ stdTTL: process.env.CACHE_TTL || 600, checkperiod: 300 });
+dotenv.config();
+
+const CACHE_TTL = process.env.CACHE_TTL || 600; // Cache TTL in seconds
 const MANGADX_API_URL = process.env.MANGADX_API_URL || "https://api.mangadex.org";
 
-module.exports = async (req, res) => {
-  cors()(req, res, async () => {
-    const mangaId = req.query.id;
+const cache = new NodeCache({ stdTTL: CACHE_TTL, checkperiod: CACHE_TTL / 2 });
 
-    if (!mangaId) {
-      return res.status(400).json({ error: "Manga ID is required" });
-    }
+const getCachedData = (key) => cache.get(key);
+const setCachedData = (key, data) => cache.set(key, data);
 
-    const cacheKey = `manga-${mangaId}`;
-    const cachedData = cache.get(cacheKey);
+export default async function handler(req, res) {
+  const { id } = req.query;
 
-    if (cachedData) {
-      return res.json(cachedData);
-    }
+  if (!id) {
+    return res.status(400).json({ error: "Manga ID is required" });
+  }
 
-    try {
-      const response = await axios.get(`${MANGADX_API_URL}/manga/${mangaId}`);
-      const mangaData = response.data.data.attributes;
+  const cacheKey = `manga-${id}`;
+  const cachedData = getCachedData(cacheKey);
 
-      const manga = {
-        id: response.data.data.id,
-        title: mangaData.title,
-        description: mangaData.description,
-        status: mangaData.status,
-        year: mangaData.year,
-        genres: mangaData.tags,
-      };
+  if (cachedData) {
+    return res.json(cachedData);
+  }
 
-      cache.set(cacheKey, manga);
-      return res.json(manga);
-    } catch (error) {
-      return res.status(500).json({ error: "Internal Server Error" });
-    }
-  });
-};
+  try {
+    const response = await axios.get(`${MANGADX_API_URL}/manga/${id}`);
+    const mangaData = response.data.data.attributes;
+
+    const manga = {
+      id: response.data.data.id,
+      title: mangaData.title,
+      description: mangaData.description,
+    };
+
+    setCachedData(cacheKey, manga);
+    return res.json(manga);
+  } catch (error) {
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+}
