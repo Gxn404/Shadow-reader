@@ -1,40 +1,45 @@
-const axios = require("axios");
-const NodeCache = require("node-cache");
-const cors = require("cors");
+import axios from "axios";
+import NodeCache from "node-cache";
+import dotenv from "dotenv";
 
-const cache = new NodeCache({ stdTTL: process.env.CACHE_TTL || 600, checkperiod: 300 });
+dotenv.config();
+
+const CACHE_TTL = process.env.CACHE_TTL || 600; // Cache TTL in seconds
 const MANGADX_API_URL = process.env.MANGADX_API_URL || "https://api.mangadex.org";
 
-module.exports = async (req, res) => {
-  cors()(req, res, async () => {
-    const query = req.query.query || "";
+const cache = new NodeCache({ stdTTL: CACHE_TTL, checkperiod: CACHE_TTL / 2 });
 
-    if (!query) {
-      return res.status(400).json({ error: "Query parameter is required" });
-    }
+const getCachedData = (key) => cache.get(key);
+const setCachedData = (key, data) => cache.set(key, data);
 
-    const cacheKey = `search-${query}`;
-    const cachedData = cache.get(cacheKey);
+export default async function handler(req, res) {
+  const { query } = req.query;
 
-    if (cachedData) {
-      return res.json(cachedData);
-    }
+  if (!query) {
+    return res.status(400).json({ error: "Query parameter is required" });
+  }
 
-    try {
-      const response = await axios.get(`${MANGADX_API_URL}/manga`, { params: { title: query } });
+  const cacheKey = `search-${query}`;
+  const cachedData = getCachedData(cacheKey);
 
-      const mangaList = response.data.data.map((manga) => ({
-        id: manga.id,
-        title: manga.attributes.title,
-        description: manga.attributes.description,
-        status: manga.attributes.status,
-        year: manga.attributes.year,
-      }));
+  if (cachedData) {
+    return res.json(cachedData);
+  }
 
-      cache.set(cacheKey, mangaList);
-      return res.json(mangaList);
-    } catch (error) {
-      return res.status(500).json({ error: "Internal Server Error" });
-    }
-  });
-};
+  try {
+    const response = await axios.get(`${MANGADX_API_URL}/manga`, {
+      params: { title: query },
+    });
+
+    const mangaList = response.data.data.map((manga) => ({
+      id: manga.id,
+      title: manga.attributes.title,
+      description: manga.attributes.description,
+    }));
+
+    setCachedData(cacheKey, mangaList);
+    return res.json(mangaList);
+  } catch (error) {
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+}
