@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {
   "name": "manga-api",
   "version": "1.0.0",
@@ -15,3 +16,22 @@
     "start": "vercel dev"
   }
 }
+=======
+{
+  "name": "manga-api",
+  "version": "1.0.0",
+  "main": "index.js",
+  "dependencies": {
+    "axios": "^1.0.0",
+    "node-cache": "^5.1.0",
+    "express-rate-limit": "^5.3.0",
+    "morgan": "^1.10.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "vercel dev"
+  }
+}
+>>>>>>> 1f0d6e76c56170febf855ad016dcaeb4bea37b11

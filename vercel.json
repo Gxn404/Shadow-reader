@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {
   "version": 2,
   "builds": [
@@ -12,3 +13,19 @@
     "/api/manga/:id": "/api/manga/[id].js"
   }
 }
+=======
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "api/**/*.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": {
+    "/api/manga/fetchId": "/api/manga/fetchId.js",
+    "/api/manga/search": "/api/manga/search.js",
+    "/api/manga/:id": "/api/manga/[id].js"
+  }
+}
+>>>>>>> 1f0d6e76c56170febf855ad016dcaeb4bea37b11
