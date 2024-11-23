@@ -1,5 +1,3 @@
-
-
 {
   "name": "manga-api",
   "version": "1.0.0",
@@ -15,5 +13,6 @@
   "devDependencies": {},
   "scripts": {
     "start": "vercel dev"
-  }
+  },
+  "type": "module"
 }
