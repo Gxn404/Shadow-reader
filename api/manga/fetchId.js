@@ -42,10 +42,26 @@ export default async function handler(req, res) {
       try {
         const response = await axios.get(`${MANGADX_API_URL}/manga/${id}`);
         const attributes = response.data.data.attributes;
+        const relationships = response.data.data.relationships || [];
+
+        let coverUrl = "default-cover.jpg"; // Default cover
+
+        const coverArtRelationship = relationships.find((rel) => rel.type === "cover_art");
+        if (coverArtRelationship) {
+          const coverResponse = await axios.get(`${MANGADX_API_URL}/cover/${coverArtRelationship.id}`);
+          const filename = coverResponse.data.data.attributes.fileName;
+          coverUrl = `https://uploads.mangadex.org/covers/${id}/${filename}`;
+        }
+
         return {
           id,
           title: attributes.title,
           description: attributes.description,
+          cover: coverUrl, // Add the cover URL to the details
+          status: attributes.status,
+          year: attributes.year,
+          genres: attributes.tags.filter((tag) => tag.attributes.group === "genre")
+            .map((tag) => tag.attributes.name.en),
         };
       } catch {
         return null;
