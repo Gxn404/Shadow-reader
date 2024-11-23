@@ -1,0 +1,28 @@
+# Node modules
+/node_modules/
+
+# Environment variables file
+.env
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Vercel build output
+/.vercel/
+
+# IDE-specific files
+.vscode/
+.idea/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Optional: build output (if you are using TypeScript or a bundler)
+dist/
+build/
+
+# Optional: Coverage folder for testing tools like Jest
+coverage/
