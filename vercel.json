@@ -3,27 +3,12 @@
   "builds": [
     {
       "src": "api/**/*.js",
-      "use": "@vercel/node",
-      "config": {
-        "externalCache": true,
-        "functions": {
-          "esm": true
-        }
-      }
+      "use": "@vercel/node"
     }
   ],
   "routes": [
-    {
-      "src": "/api/manga/fetchId",
-      "dest": "/api/manga/fetchId.js"
-    },
-    {
-      "src": "/api/manga/search",
-      "dest": "/api/manga/search.js"
-    },
-    {
-      "src": "/api/manga/:id",
-      "dest": "/api/manga/[id].js"
-    }
+    { "src": "/api/manga/fetchId", "dest": "/api/manga/fetchId.js" },
+    { "src": "/api/manga/search", "dest": "/api/manga/search.js" },
+    { "src": "/api/manga/(.*)", "dest": "/api/manga/[id].js" }
   ]
 }
