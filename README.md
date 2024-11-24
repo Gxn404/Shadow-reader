@@ -36,27 +36,31 @@ A serverless API built with Node.js to fetch and display manga details using the
 
 1. Clone the repository:
 
+```bash
 git clone https://github.com/ShadowmaxCoder/Shadow-reader.git
-cd <repository-name>
-
+cd Shadow-reader
+```
 
 2. Install dependencies:
 
+```bash
 npm install
-
+```
 
 3. Environment Variables: Create a .env file in the root directory and add:
 
+```bash
 MANGADX_API_URL=https://api.mangadex.org
 CACHE_TTL=600
-
+```
 
 4. Run the application locally:
 
+```bash
 npm run dev
+```
 
-
-5. Test the API locally: Open http://localhost:3000/api/manga/search?query=<manga-title> in your browser or use a tool like Postman.
+5. Test the API locally: Open http://localhost:3000/api/manga/search?query=naruto in your browser or use a tool like Postman.
 
 
 
@@ -67,18 +71,21 @@ npm run dev
 
 1. Install Vercel CLI:
 
+```bash
 npm install -g vercel
-
+```
 
 2. Login to Vercel:
 
+```bash
 vercel login
-
+```
 
 3. Deploy the application:
 
+```bash
 vercel
-
+```
 
 4. Vercel will provide a live deployment URL after completion.
 
@@ -91,7 +98,7 @@ vercel
 
 /api/manga/search
 
-Method: GET
+Method: GET<br>
 Description: Search for manga details by title.
 
 Query Parameters:
@@ -102,6 +109,7 @@ GET /api/manga/search?query=naruto
 
 Example Response:
 
+```json
 [
   {
     "id": "123456",
@@ -117,7 +125,7 @@ Example Response:
     "genres": ["Action", "Adventure", "Fantasy"]
   }
 ]
-
+```
 
 ---
 
