@@ -17,6 +17,7 @@ A serverless API built with Node.js to fetch and display manga details using the
 
 ## 📁 Project Structure
 
+```bash
 .
 ├── api/
 │   ├── manga/
@@ -27,7 +28,7 @@ A serverless API built with Node.js to fetch and display manga details using the
 ├── package.json           # Dependencies and scripts
 ├── README.md              # Project documentation
 └── vercel.json            # Vercel configuration
-
+```
 
 ---
 
