@@ -13,6 +13,14 @@ const getCachedData = (key) => cache.get(key);
 const setCachedData = (key, data) => cache.set(key, data);
 
 export default async function handler(req, res) {
+    res.setHeader("Access-Control-Allow-Origin", "http://localhost:8080"); // You can specify your frontend URL here instead of "*"
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
+  // Handle OPTIONS request (preflight request) for CORS
+  if (req.method === "OPTIONS") {
+    return res.status(200).end();
+  }
   const { id } = req.query;
 
   if (!id) {
