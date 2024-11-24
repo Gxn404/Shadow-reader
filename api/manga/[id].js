@@ -13,40 +13,66 @@ const getCachedData = (key) => cache.get(key);
 const setCachedData = (key, data) => cache.set(key, data);
 
 export default async function handler(req, res) {
-    res.setHeader("Access-Control-Allow-Origin", "http://localhost:8080"); // You can specify your frontend URL here instead of "*"
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  // Set CORS headers
+  res.setHeader("Access-Control-Allow-Origin", "http://localhost:8080"); // Change this to your frontend URL in production
+  res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
-  // Handle OPTIONS request (preflight request) for CORS
+  // Handle OPTIONS (CORS preflight request)
   if (req.method === "OPTIONS") {
     return res.status(200).end();
   }
+
+  // Ensure the method is GET
+  if (req.method !== "GET") {
+    return res.status(405).json({ error: "Method Not Allowed" });
+  }
+
   const { id } = req.query;
 
   if (!id) {
-    return res.status(400).json({ error: "Manga ID is required" });
+    return res.status(400).json({ error: "Manga ID is required." });
   }
 
   const cacheKey = `manga-${id}`;
   const cachedData = getCachedData(cacheKey);
 
+  // Serve cached data if available
   if (cachedData) {
-    return res.json(cachedData);
+    console.log("[CACHE] Returning cached manga details.");
+    return res.status(200).json(cachedData);
   }
 
   try {
+    // Fetch manga details from the MangaDex API
     const response = await axios.get(`${MANGADX_API_URL}/manga/${id}`);
     const mangaData = response.data.data.attributes;
 
+    // Structure the manga details
     const manga = {
       id: response.data.data.id,
-      title: mangaData.title,
-      description: mangaData.description,
+      title: mangaData.title?.en || "Title not available",
+      description: mangaData.description?.en || "Description not available",
+      status: mangaData.status,
+      year: mangaData.year,
+      genres: mangaData.tags?.map((tag) => tag.attributes?.name?.en) || [],
     };
 
+    // Cache the response
     setCachedData(cacheKey, manga);
-    return res.json(manga);
+
+    // Respond with the manga details
+    return res.status(200).json(manga);
   } catch (error) {
-    return res.status(500).json({ error: "Internal Server Error" });
+    console.error(`[ERROR] Failed to fetch manga ID ${id}:`, error.message);
+
+    // Handle known errors or return a general error message
+    if (error.response) {
+      return res
+        .status(error.response.status)
+        .json({ error: error.response.data.message || "Failed to fetch manga." });
+    } else {
+      return res.status(500).json({ error: "Internal Server Error" });
+    }
   }
 }
