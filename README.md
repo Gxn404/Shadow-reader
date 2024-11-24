@@ -1,5 +1,3 @@
-
-
 # Shadow reader API
 
 A serverless API built with Node.js to fetch and display manga details using the MangaDex API. This project is designed for easy deployment on Vercel and supports caching for efficient performance.
@@ -32,7 +30,7 @@ A serverless API built with Node.js to fetch and display manga details using the
 
 ---
 
-🛠️ Setup and Installation
+## 🛠️ Setup and Installation
 
 1. Clone the repository:
 
@@ -67,7 +65,7 @@ npm run dev
 
 ---
 
-🌐 Deployment on Vercel
+## 🌐 Deployment on Vercel
 
 1. Install Vercel CLI:
 
@@ -94,7 +92,7 @@ vercel
 
 ---
 
-🔗 API Endpoints
+## 🔗 API Endpoints
 
 /api/manga/search
 
@@ -129,14 +127,14 @@ Example Response:
 
 ---
 
-🔧 Configuration
+## 🔧 Configuration
 
 Environment Variables
 
 
 ---
 
-❗ Troubleshooting
+## ❗ Troubleshooting
 
 Common Errors
 
@@ -164,7 +162,7 @@ Solution: Verify the query or check MangaDex API status.
 
 ---
 
-🤝 Contributing
+## 🤝 Contributing
 
 Contributions are welcome! Follow these steps to contribute:
 
@@ -193,14 +191,14 @@ git push origin feature/your-feature-name
 
 ---
 
-📜 License
+## 📜 License
 
 This project is licensed under the MIT License. See the LICENSE file for more information.
 
 
 ---
 
-💬 Support
+## 💬 Support
 
 For questions or issues, please open an issue on GitHub.
 
