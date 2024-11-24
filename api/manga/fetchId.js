@@ -15,7 +15,7 @@ const setCachedData = (key, data) => cache.set(key, data);
 
 export default async function handler(req, res) {
   // Set CORS headers to allow cross-origin requests (if needed)
-  res.setHeader("Access-Control-Allow-Origin", "http:localhost:8080"); // You can specify your frontend URL here instead of "*"
+  res.setHeader("Access-Control-Allow-Origin", "http://localhost:8080"); // You can specify your frontend URL here instead of "*"
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
