@@ -25,9 +25,18 @@ const handler = async (req, res) => {
       // Fetch manga details
       const mangaResponse = await axios.get(`${MANGADX_API_URL}/manga/${mangaId}`);
       const mangaData = mangaResponse.data.data.attributes;
-
+      
       // Extract relationships for author, artist, and related manga
       const relationships = mangaResponse.data.data.relationships;
+
+          const coverArtRelationship = relationships.find((rel) => rel.type === "cover_art");
+          let coverUrl = "default-cover.jpg"; 
+
+          if (coverArtRelationship) {
+            const coverResponse = await axios.get(`${MANGADX_API_URL}/cover/${coverArtRelationship.id}`);
+            const filename = coverResponse.data.data.attributes.fileName;
+            coverUrl = `https://uploads.mangadex.org/covers/${mangaId}/${filename}`;
+          }
       const authorId = relationships.find(rel => rel.type === "author")?.id;
       const artistId = relationships.find(rel => rel.type === "artist")?.id;
       const relatedMangaIds = relationships
@@ -154,7 +163,8 @@ const scanlation = chapterRelationships[0]
         demography : mangaData.publicationDemographic,
         contentRating : mangaData.contentRating,
         genres: mangaData.tags.filter(tag => tag.attributes.group === "genre").map(tag => tag.attributes.name.en), // Extract genres
-        themes: mangaData.tags.filter(tag => tag.attributes.group === "theme").map(tag => tag.attributes.name.en), // Example themes
+        themes: mangaData.tags.filter(tag => tag.attributes.group === "theme").map(tag => tag.attributes.name.en),
+        cover: coverUrl, // Example themes
         origination,
         scanlation,
         publishers,
