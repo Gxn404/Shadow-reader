@@ -29,7 +29,7 @@ const handler = async (req, res) => {
       // Extract relationships for author, artist, and related manga
       const relationships = mangaResponse.data.data.relationships;
       const authorId = relationships.find(rel => rel.type === "author")?.id;
-   //   const artistId = relationships.find(rel => rel.type === "artist")?.id;
+      const artistId = relationships.find(rel => rel.type === "artist")?.id;
       const relatedMangaIds = relationships
         .filter(rel => rel.type === "related")
         .map(rel => rel.id);
@@ -38,35 +38,48 @@ const handler = async (req, res) => {
       const authorData = authorId
         ? await axios.get(`${MANGADX_API_URL}/author/${authorId}`)
         : null;
-     // const artistData = artistId
-    //    ? await axios.get(`${MANGADX_API_URL}/artist/${artistId}`)
-      //  : null;
+      const artistData = artistId
+        ? await axios.get(`${MANGADX_API_URL}/artist/${artistId}`)
+        : null;
 
       // Fetch related manga details
       const relatedManga = [];
-      for (const relatedId of relatedMangaIds) {
-        try {
-          const relatedResponse = await axios.get(`${MANGADX_API_URL}/manga/${relatedId}`);
-          relatedManga.push({
-            id: relatedId,
-            title: relatedResponse.data.data.attributes.title,
-          });
-        } catch (error) {
-          console.error(`Error fetching related manga ${relatedId}:`, error);
-        }
-      }
+      for (const related of relationships.filter(rel => rel.type === "manga" && rel.related)) {
+  const relatedId = related.id;
+  const relatedComicType = related.type;
+  const relatedType = related.related || "Unknown"; // Relationship type (e.g., shared_universe, sequel, prequel, etc.)
+
+try {
+    const relatedResponse = await axios.get(`${MANGADX_API_URL}/manga/${relatedId}`);
+    const relatedMangaAttributes = relatedResponse.data.data.attributes;
+
+    // Collect related manga data with relationship type included
+    relatedManga.push({
+      id: relatedId,
+      title: relatedMangaAttributes.title,
+      description: relatedMangaAttributes.description || "No description available",
+      genres: relatedMangaAttributes.tags
+        .filter(tag => tag.attributes.group === "genre")
+        .map(tag => tag.attributes.name.en),
+      themes: relatedMangaAttributes.tags
+        .filter(tag => tag.attributes.group === "theme")
+        .map(tag => tag.attributes.name.en),
+       relatedType, 
+       relatedComicType
+       // Add the relationship type (e.g., sequel, prequel, etc.)
+    });
+  } catch (error) {
+    console.error(`Error fetching related manga ${relatedId}:`, error);
+  }
+}
 
       // Extract other fields like origination, scanlation, and publishers
       const origination = mangaData.originalLanguage || "Unknown";
-      const scanlation = relationships
-        .filter(rel => rel.type === "scanlation_group")
-        .map(rel => rel.attributes.name) || ["Unknown"];
+      
       const publishers = relationships
         .filter(rel => rel.type === "publisher")
         .map(rel => rel.attributes.name) || ["Unknown"];
-      const rawLinks = relationships
-        .filter(rel => rel.type === "raw")
-        .map(rel => rel.attributes.url) || ["No raw link available"];
+      const rawLinks = mangaData.links || ["No raw link available"];
 
       // Build recommendations - example data
       const recommendations = [
@@ -75,12 +88,40 @@ const handler = async (req, res) => {
       ];
 
       // Generate dummy chapter data (replace with real API calls if available)
-      const chapters = [
-        { number: 1, title: "To You, 2,000 Years From Now" },
-        { number: 2, title: "That Day, The Girl Was Still Alive" },
-        { number: 3, title: "A Maiden's Promise" },
-      ];
+      const chapterResponse = await axios.get(`${MANGADX_API_URL}/manga/${mangaId}/feed`);
+       
+       const chapterData = chapterResponse.data.data.map(chapter => chapter.attributes);
+       console.log(JSON.stringify(chapterData));
+       
+       const chapterRelationships = chapterResponse.data.data.map(chapter => chapter.relationships);
+       
+       const chapterId = chapterResponse.data.data.map(chapter => chapter.id);
+       
+       const chapter = chapterData.map((chapter, index) => ({
+  id: chapterId[index], // this might not be correct as `chapterId` is an array, so check its usage
+  chapter: chapter.chapter,
+  volume: chapter.volume,
+  title: chapter.title,
+  translatedLanguage: chapter.translatedLanguage,
+  externalUrl: chapter.externalUrl,
+  publishAt: chapter.publishAt,
+  readableAt: chapter.readableAt,
+  createdAt: chapter.createdAt,
+  updatedAt: chapter.updatedAt,
+  pages: chapter.pages,
+uploadedUser: chapterRelationships[index]
+  .filter(rel => rel.type === "user")
+  .map(rel => rel.id || "N/A"),
+  scanlation : chapterRelationships[index].filter(rel => rel.type === "scanlation_group")
+        .map(rel => (rel.id)) || ["Unknown"]
+}));
 
+const sortedChapters = chapter.sort((a, b) => a.chapter - b.chapter);
+
+
+const scanlation = chapterRelationships[0]
+        .map(rel => (rel.id)) || ["Unknown"];
+        console.log(scanlation);
       // Simulate comment data (In actual use, fetch from a related comment endpoint)
       const comments = [
         {
@@ -110,22 +151,28 @@ const handler = async (req, res) => {
         description: mangaData.description,
         status: mangaData.status,
         year: mangaData.year,
-        genres: mangaData.tags.map(tag => tag.attributes.name), // Extract genres
-        themes: ["Survival", "Betrayal", "Humanity"], // Example themes
+        demography : mangaData.publicationDemographic,
+        contentRating : mangaData.contentRating,
+        genres: mangaData.tags.filter(tag => tag.attributes.group === "genre").map(tag => tag.attributes.name.en), // Extract genres
+        themes: mangaData.tags.filter(tag => tag.attributes.group === "theme").map(tag => tag.attributes.name.en), // Example themes
         origination,
         scanlation,
         publishers,
         rawLinks,
         recommendations,
         author: authorData ? authorData.data.data.attributes.name : "Unknown",
-        //artist: artistData ? artistData.data.data.attributes.name : "Unknown",
+        artist: artistData ? artistData.data.data.attributes.name : "Unknown",
         related: relatedManga,
-        chapters: chapters,
+        updatedChapter : mangaData.latestUploadedChapter,
+        lastChapter : mangaData.lastChapter,
+        lastVolume : mangaData.lastVolume,
+        availableTranslatedLanguages : mangaData.availableTranslatedLanguages,
+        chapters: sortedChapters,
         comments, // Include the simulated comment data
         links: {
           mangadex: `${MANGADX_API_URL}/manga/${mangaId}`,
           author: authorId ? `${MANGADX_API_URL}/author/${authorId}` : null,
-        //  artist: artistId ? `${MANGADX_API_URL}/author/${artistId}` : null,
+          artist: artistId ? `${MANGADX_API_URL}/author/${artistId}` : null,
         },
       };
 
