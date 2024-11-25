@@ -164,7 +164,7 @@ const scanlation = chapterRelationships[0]
         contentRating : mangaData.contentRating,
         genres: mangaData.tags.filter(tag => tag.attributes.group === "genre").map(tag => tag.attributes.name.en), // Extract genres
         themes: mangaData.tags.filter(tag => tag.attributes.group === "theme").map(tag => tag.attributes.name.en),
-        cover: coverUrl, // Example themes
+        cover: coverUrl || "N/A", // Example themes
         origination,
         scanlation,
         publishers,
