@@ -39,7 +39,7 @@ const handler = async (req, res) => {
         ? await axios.get(`${MANGADX_API_URL}/author/${authorId}`)
         : null;
       const artistData = artistId
-        ? await axios.get(`${MANGADX_API_URL}/artist/${artistId}`)
+        ? await axios.get(`${MANGADX_API_URL}/author/${artistId}`)
         : null;
 
       // Fetch related manga details
@@ -172,7 +172,7 @@ const scanlation = chapterRelationships[0]
         links: {
           mangadex: `${MANGADX_API_URL}/manga/${mangaId}`,
           author: authorId ? `${MANGADX_API_URL}/author/${authorId}` : null,
-          artist: artistId ? `${MANGADX_API_URL}/author/${artistId}` : null,
+         artist: artistId ? `${MANGADX_API_URL}/author/${artistId}` : null,
         },
       };
 
