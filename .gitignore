@@ -26,3 +26,4 @@ build/
 
 # Optional: Coverage folder for testing tools like Jest
 coverage/
+.vercel

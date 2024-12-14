@@ -12,6 +12,6 @@
   },
   "devDependencies": {},
   "scripts": {
-    "start": "vercel dev"
+    "start": ""
   }
 }

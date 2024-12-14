@@ -8,8 +8,10 @@
     }
   ],
   "routes": [
+    { "src": "/api/manga/chapter/(?<id>[^/]+)", "dest": "/api/manga/chapter/[id].js" },
     { "src": "/api/manga/fetchId", "dest": "/api/manga/fetchId.js" },
     { "src": "/api/manga/search", "dest": "/api/manga/search.js" },
     { "src": "/api/manga/(?<id>[^/]+)", "dest": "/api/manga/[id].js" }
   ]
 }
+
